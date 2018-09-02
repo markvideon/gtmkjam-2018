@@ -8,34 +8,41 @@ public class FoeController : MonoBehaviour
     [SerializeField] Transform[] spawnTransforms = new Transform[4];
     [SerializeField] private float speedFactor = 1f;
     private ComboManager gameComboManager;
-
+    private UIManager gameUIManager;
 
     private int nextSpawnIndex;
     private Vector3 movementDirection;
     private int killCombo;
+    private int scoreIncrement = 10;
 
 
     public void Start()
     {
         gameComboManager = FindObjectOfType<ComboManager>();
+        gameUIManager = FindObjectOfType<UIManager>();
         OnDeath();
     }
 
     public void LateUpdate()
     {
-        // If the foe is moving downward from left or right of player
-        if (nextSpawnIndex == 0 || nextSpawnIndex == 1)
-        {
-            movementDirection.x = 0f;
-            movementDirection.y = -1f;
-            movementDirection.z = 0f;
-        }
-        // If the foe is moving rightward above or below the player
-        else
-        {
-            movementDirection.x = 1f;
-            movementDirection.y = 0f;
-            movementDirection.z = 0f;
+        if (gameUIManager.GetTime()< 60f) {
+
+        
+            // If the foe is moving downward from left or right of player
+            if (nextSpawnIndex == 0 || nextSpawnIndex == 1)
+            {
+                movementDirection.x = 0f;
+                movementDirection.y = -1f;
+                movementDirection.z = 0f;
+            }
+            // If the foe is moving rightward above or below the player
+            else
+            {
+                movementDirection.x = 1f;
+                movementDirection.y = 0f;
+                movementDirection.z = 0f;
+
+            }
 
         }
 
@@ -46,16 +53,21 @@ public class FoeController : MonoBehaviour
     public void OnBecameInvisible()
     {
         OnDeath();
+        scoreIncrement--;
     }
 
     public void OnTriggerStay2D(Collider2D collider)
     {
-        Debug.Log("Colliding");
-        if (killCombo == gameComboManager.supplyCombo())
+        if (killCombo == gameComboManager.supplyCombo() && 
+            collider.name == "Gate")
         {
             /* If Combo manager is not reset, and the user does not press
              * additional keys, problems will arise...*/
             gameComboManager.resetCombo();
+
+            speedFactor += 0.04f;
+            scoreIncrement+= 7;
+            gameUIManager.IncrementScore(scoreIncrement);
             OnDeath();
         }
     }
@@ -86,12 +98,6 @@ public class FoeController : MonoBehaviour
         if (spawnTransforms[nextSpawnIndex])
         {
             this.transform.position = spawnTransforms[nextSpawnIndex].position;
-
-            if (speedFactor < 9f)
-            {
-                speedFactor += 0.01f;
-            }
-
         }
         else
         {
