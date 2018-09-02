@@ -10,17 +10,18 @@ public class ComboManager : MonoBehaviour {
 
     private float comboDuration = 0f;
 
-    [SerializeField]
-    private float comboTimeout = 4.0f;
+    [SerializeField] private float comboTimeout = 4.0f;
 
 
 	public void LateUpdate () {
 
-        /* Tick happens here. Condition is true if timer is currently running.
-         * Timer starts running after first key press in an attempted combo. */
+        /* Scrapped.
+         * Tick happens here. Condition is true if timer is currently running.
+         * Timer starts running after first key press in an attempted combo. 
         if (comboDuration > 0f) {
             comboDuration += Time.deltaTime;
         }
+        */
 
         // Mapping input sequences to integers. Up = 1, Left = 2...
         if (Input.GetKeyDown(KeyCode.UpArrow)) {
@@ -37,7 +38,8 @@ public class ComboManager : MonoBehaviour {
 
         // If a key press detected
         if (keyPressed > 0) {
-            IncrementInput(keyPressed);
+            //IncrementInput(keyPressed);
+            currentCombo = keyPressed;
             keyPressed = 0;
 
             // If the timer is at rest, start running
@@ -47,35 +49,23 @@ public class ComboManager : MonoBehaviour {
         }
         
 
-        // If four keys have been pressed.
-        if (currentCombo > 1000) {
-            PerformControl();
-            comboDuration = 0f;
-           
-        } // If time limit has been exceeded.
-        else if (comboDuration > comboTimeout) {
-            comboDuration = 0f;
-            currentCombo = 0;
-        }
+          
     }
 
     /*  Combinations are plainly readable left-to-right 
-        as decimal numbers.
+        as decimal numbers. Store three most recent presses.
     */
     private void IncrementInput(int nextInput) {
+        currentCombo = currentCombo % 100;
         currentCombo *= 10;
         currentCombo += nextInput;
     }
+     
+    public int supplyCombo() {
+        return currentCombo;
+    }
 
-    // Requires hardcoded combos at present.
-    private void PerformControl() {
-
-        if (currentCombo == 1331) {
-            Debug.Log("Up Down Down Up");
-        }
-
-        // Reset combo after performance.
+    public void resetCombo() {
         currentCombo = 0;
     }
-     
 }

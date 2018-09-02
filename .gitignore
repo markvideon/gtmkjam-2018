@@ -9,7 +9,9 @@
 *.ipa
 *.apk
 *.userprefs
+*.suo
 
+.vs/
 build/
 [Ss]creenshots/
-*.suo
+
